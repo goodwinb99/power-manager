@@ -3,3 +3,6 @@ tmp/
 
 # Claude Code local settings
 .claude/
+
+# Design/plan documents (CC-generated, not for publishing)
+docs/plans/

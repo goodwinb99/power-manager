@@ -68,13 +68,14 @@ Node-RED system paths:
 ## Current Node-RED Project: Power Manager
 
 ### Goal
-Solar-priority operation with automatic shore power management:
-1. **Auto mode**: connect shore when SOC drops to low threshold, disconnect at high threshold
-2. **Shore powers AC loads only** — charger disable prevents grid-to-battery charging
-3. **Solar continues charging** from MPPT regardless of shore state
-4. **Manual overrides**: force shore on or off independent of SOC
-5. **Independent AC charger control**: enable/disable charger separately from shore mode
-6. Dashboard with mode switch, SOC gauge, threshold sliders, AC charger control, AC input limit, live readings
+Solar-priority operation with automatic shore power and charger management:
+1. **Shore auto mode**: connect shore when SOC drops to low threshold, disconnect at high threshold
+2. **Charger auto mode**: enable AC charger when SOC drops further past a lower threshold, disable at a recovery threshold
+3. **Shared voltage safety**: voltage threshold triggers both shore + charger simultaneously
+4. **Shore powers AC loads only** by default — charger disable prevents grid-to-battery charging
+5. **Solar continues charging** from MPPT regardless of shore/charger state
+6. **Manual overrides**: force shore or charger on/off independent of SOC
+7. Dashboard with mode switches, SOC gauge, threshold sliders, AC charger control, AC input limit, live readings
 
 ### Approach: Charge Current Control Assistant + Cerbo Relay 1
 
@@ -131,14 +132,52 @@ SHORE_ON
 - **Deploy is non-disruptive** — all state (mode, thresholds, actuators) persists across deploys
 - Init code only sets defaults for missing keys (fresh install)
 
-### AC Charger Control (Independent)
+### AC Charger Mode (Auto / On / Off)
 
-The `AC Charger Toggle` (`ui-button-group`, ENABLED / DISABLED) controls the relay independently of shore mode:
-- **ENABLED**: Relay 1 = 0 (open) — charger active
-- **DISABLED**: Relay 1 = 1 (closed) — charger disabled via AUX1
+The dashboard `AC Charger` button group (`ui-button-group`) controls the charger relay:
 
-This is a manual override — the state machine does NOT control the relay.
-Typical use: keep charger disabled while shore is on (loads-only mode), or enable charger to bulk-charge from shore/generator.
+```
+AUTO (charger_mode = "auto")
+  Charger state machine enabled — Relay 1 driven by SOC/voltage thresholds
+  CHARGER_OFF: Relay 1 = 1 (closed, charger disabled)
+  CHARGER_ON:  Relay 1 = 0 (open, charger enabled)
+
+ON (charger_mode = "on")
+  State machine disabled — Relay 1 = 0 (charger always enabled)
+
+OFF (charger_mode = "off")
+  State machine disabled — Relay 1 = 1 (charger always disabled)
+```
+
+### Charger Auto State Machine
+
+```
+CHARGER_ON (default — protective)
+  Relay 1 = 0 (charger enabled)
+  SOC >= charger_disable_soc  →  CHARGER_OFF
+
+CHARGER_OFF
+  Relay 1 = 1 (charger disabled)
+  SOC <= charger_enable_soc OR voltage <= voltage_threshold_low  →  CHARGER_ON
+```
+
+- 30-second minimum between charger transitions (separate timer from shore)
+- SOC = 0 and voltage = 0 guards prevent false transitions
+- Default CHARGER_ON is protective — in the hysteresis zone, assumes battery may need help
+- Charger disables on SOC only (voltage recovers fast once charging starts)
+- Charger auto is independent of shore mode — relay state is pre-positioned regardless
+- `charger_state` is preserved across mode switches for correct hysteresis
+
+### Threshold Ordering Constraint
+
+```
+charger_enable_soc < shore_connect_soc
+charger_enable_soc < charger_disable_soc ≤ shore_disconnect_soc
+```
+
+Note: `charger_disable_soc` is independent of `shore_connect_soc` — it can be below, equal, or above it. This allows the charger to disable early (e.g., voltage-triggered emergency charging stops at 20% even if shore connect is 40%).
+All threshold sliders cross-validate against each other and reject values that violate these constraints.
+The voltage threshold is shared between shore and charger — when voltage drops below it, both activate.
 
 ### AC Input Current Limit
 
@@ -170,38 +209,52 @@ Reads current value on deploy via `ac_in2_limit_read` sensor node.
 | Set Relay 1 (Charger Disable) | victron-output-relay | com.victronenergy.system/0 | /Relay/1/State |
 | Set AC In 2 Limit | victron-output-custom | com.victronenergy.vebus.ttyS4 | /Ac/In/2/CurrentLimit |
 
-**Dashboard controls:**
+**Dashboard controls** (all in "Power Control" group, 12-col):
 | Node name | Type | Purpose |
 |-----------|------|---------|
 | Shore Mode | ui-button-group | AUTO / ON / OFF shore power mode |
 | Shore Status | ui-text | Shore status with connect reason (HTML colored) |
-| AC Charger Toggle | ui-button-group | ENABLED / DISABLED AC charger control |
-| AC Input Limit Slider | ui-slider | Shore input current limit (10–50A) |
-| Low Threshold | ui-slider | SOC % to connect shore (auto mode) |
-| High Threshold | ui-slider | SOC % to disconnect shore (auto mode) |
-| Voltage Threshold | ui-slider | Battery voltage to connect shore (40–54V, auto mode) |
+| AC Charger | ui-button-group | AUTO / ON / OFF charger mode |
+| Charger Status | ui-text | Charger status with connect reason (HTML colored) |
+| Low Threshold | ui-slider | SOC % to connect shore (shore auto mode) |
+| High Threshold | ui-slider | SOC % to disconnect shore (shore auto mode) |
+| Charger Enable SOC | ui-slider | SOC % to enable charger (charger auto mode) |
+| Charger Disable SOC | ui-slider | SOC % to disable charger (charger auto mode) |
+| Voltage Threshold | ui-slider | Battery voltage safety — triggers both shore + charger (40–54V) |
+| AC Input Limit Slider | ui-slider | Shore input current limit (0–50A) |
+| Threshold Status | ui-text | Combined threshold summary text |
 
 **Flow context keys** (readable via `GET https://venus.local:1881/context/flow/aa00000000000001`):
-- `state`: "SHORE_OFF" | "SHORE_ON" (auto mode internal state)
+- `state`: "SHORE_OFF" | "SHORE_ON" (shore auto state)
 - `connect_reason`: "soc" | "voltage" | null (what triggered SHORE_ON)
-- `enabled`: boolean (true when shore_mode = "auto")
+- `shore_enabled`: boolean (true when shore_mode = "auto")
 - `shore_mode`: "auto" | "on" | "off"
-- `threshold_low`: number (default 40)
-- `threshold_high`: number (default 60)
-- `voltage_threshold_low`: number (default 48.0, volts)
-- `manual_relay`: boolean (true = charger disabled)
+- `threshold_low`: number (default 40, SOC % to connect shore)
+- `threshold_high`: number (default 60, SOC % to disconnect shore)
+- `voltage_threshold_low`: number (default 48.0, shared voltage safety threshold)
+- `charger_mode`: "auto" | "on" | "off"
+- `charger_enabled`: boolean (true when charger_mode = "auto")
+- `charger_state`: "CHARGER_OFF" | "CHARGER_ON" (charger auto state)
+- `charger_enable_soc`: number (default 25, SOC % to enable charger)
+- `charger_disable_soc`: number (default 45, SOC % to disable charger)
+- `charger_connect_reason`: "soc" | "voltage" | null (what triggered CHARGER_ON)
+- `last_charger_change`: timestamp (ms, charger cooldown timer)
 - `ac_limit`: number (current limit in amps)
 - `sensor_soc`, `sensor_batt_current`, `sensor_batt_temp`, `sensor_batt_voltage`
 - `sensor_ac_out_l1`, `sensor_ac_out_l2`
 - `sensor_shore_in_l1`, `sensor_shore_in_l2`
 - `sensor_mppt_power`
-- `last_state_change`: timestamp (ms)
+- `last_state_change`: timestamp (ms, shore cooldown timer)
 
 **Dashboard:** `https://venus.local:1881/dashboard/power-manager`
-- SOC gauge, shore mode buttons (auto/on/off), shore status text, threshold sliders
-- AC charger buttons (enabled/disabled), AC input limit slider
-- AC Out L1/L2 gauges, Shore In L1/L2 gauges, solar gauge
+- SOC gauge, AC Out L1/L2 gauges, Shore In L1/L2 gauges, solar gauge
 - Battery current widget, SOC and power history charts
+- **Power Control** (unified 12-col group):
+  - Shore mode buttons (auto/on/off), shore status text
+  - AC charger buttons (auto/on/off), charger status text
+  - Shore connect/disconnect SOC sliders, charger enable/disable SOC sliders
+  - Voltage safety slider (shared), AC input limit slider
+  - Threshold summary text
 
 ---
 
@@ -333,10 +386,14 @@ dbus -y com.victronenergy.system /Relay/1/State SetValue 0
 ## Safety Notes
 
 - **Deploy is non-disruptive** — state persists, system continues operating through deploys
-- **Shore ON/OFF modes**: direct manual control of IgnoreAcIn2, state machine inactive
-- **AC charger control is independent**: can disable charger in any shore mode
+- **Shore ON/OFF modes**: direct manual control of IgnoreAcIn2, shore state machine inactive
+- **Charger ON/OFF modes**: direct manual control of Relay 1, charger state machine inactive
+- **Charger auto is independent of shore**: relay state is pre-positioned regardless of shore mode
 - **Node-RED crash**: relay and IgnoreAcIn2 stay in last state; shore continues powering loads if accepted
-- **Sensor failure guards**: SOC = 0 and voltage = 0 prevent false SHORE_ON transitions
-- **30s minimum** between auto mode state transitions prevents relay cycling
+- **Sensor failure guards**: SOC = 0 and voltage = 0 prevent false transitions in both state machines
+- **Separate 30s cooldowns**: shore and charger transitions have independent timers
+- **Threshold cross-validation**: sliders enforce charger_enable < shore_connect, charger_enable < charger_disable ≤ shore_disconnect
+- **Protective charger default**: CHARGER_ON default in hysteresis zone assumes battery may need help
+- **Charger state preserved across mode switches**: returning to auto resumes correct hysteresis
 - **PreventFeedback**: already set (no grid backfeed)
 - **Switch-as-group OFF is safe**: no ESS algorithm, no phase coordination needed
