@@ -141,12 +141,14 @@ Or import `flows.json` manually via the Node-RED editor (Menu → Import).
 
 Access at `https://<gx-device>:1881/dashboard/power-manager`
 
-- **Shore Mode** — AUTO / ON / OFF buttons
-- **Shore Status** — current state with connect reason; shows warning when VE.Bus is unavailable (e.g., during VEConfigure)
+- **Shore Mode** — AUTO / ON / OFF buttons for shore power acceptance
+- **AC Charger** — AUTO / ON / OFF buttons for inverter/charger control
+- **Shore / Charger Status** — current state with connect reason; shows warning when VE.Bus is unavailable
 - **SOC Gauge** — battery state of charge
-- **Threshold Sliders** — low SOC, high SOC, and voltage thresholds for auto mode
-- **AC Charger Toggle** — enable/disable charger independently of shore mode
-- **AC Input Limit Slider** — shore input current limit (auto-reads hardware min/max)
+- **Shore Threshold Sliders** — SOC % to connect/disconnect shore (auto mode)
+- **Charger Threshold Sliders** — SOC % to enable/disable AC charger (auto mode)
+- **Voltage Safety Slider** — shared voltage threshold that triggers both shore + charger
+- **AC Input Limit Slider** — shore input current limit
 - **Power Gauges** — AC output L1/L2, shore input L1/L2, solar power
 - **Battery** — current and voltage
 - **History Charts** — SOC and power over time
@@ -167,11 +169,31 @@ See [CLAUDE.md](CLAUDE.md) for the full API when writing change scripts.
 ## Safety
 
 - **Deploy is non-disruptive** — all state (mode, thresholds, actuators) persists across deploys
-- **VEConfigure protection** — state machine freezes when VE.Bus is unavailable (state 250), preventing shore disconnection during inverter programming
-- **Sensor failure guards** — SOC = 0 and voltage = 0 are treated as sensor failures and won't trigger state transitions
+- **VEConfigure protection** — both state machines freeze when VE.Bus is unavailable (state 250), preventing shore disconnection during inverter programming
+- **Sensor failure guards** — SOC = 0 and voltage = 0 are treated as sensor failures and won't trigger state transitions in either state machine
 - **Dual-threshold disconnect** — shore will only disconnect when *both* SOC and voltage are above their thresholds, preventing premature disconnection if one reading recovers while the other hasn't
-- **30-second minimum** between auto mode state transitions prevents relay cycling
+- **Separate 30-second cooldowns** — shore and charger auto transitions have independent minimum intervals to prevent relay cycling
+- **Threshold cross-validation** — sliders reject values that violate the ordering constraint (charger enable < shore connect, charger disable ≤ shore disconnect)
+- **Protective charger default** — charger auto defaults to CHARGER_ON in the hysteresis zone, assuming the battery may need help
 - **Node-RED crash** — relay and IgnoreAcIn2 stay in their last state; shore continues if it was accepted
+
+## Adapting to Other System Voltages
+
+This project ships configured for a **48V LFP (LiFePO4)** battery system. The only voltage-specific items are:
+
+| Item | Current (48V) | 12V LFP | 24V LFP | 12V Lead-Acid |
+|------|---------------|---------|---------|----------------|
+| Voltage slider range | 40–54V | 10–14.6V | 20–29.2V | 10–15V |
+| Voltage slider step | 0.1V | 0.1V | 0.1V | 0.1V |
+| Default voltage threshold | 48.0V | 12.0V | 24.0V | 11.5V |
+
+To change these, update three nodes in `flows.json` via a script:
+
+1. **Voltage Threshold slider** (`aa000000000000f2`) — update `min`, `max`, and default value
+2. **Set Voltage Threshold handler** (`aa000000000000f3`) — update the clamp range in `Math.max(min, Math.min(max, ...))`
+3. **State Machine init** (`aa00000000000030`, `initialize` field) — update the default value for `voltage_threshold_low`
+
+Everything else (SOC thresholds, shore/charger modes, relay logic, DBUS paths) is voltage-independent and works on any Victron system.
 
 ## File Structure
 
