@@ -402,7 +402,7 @@
         "type": "function",
         "z": "aa00000000000001",
         "name": "State Machine",
-        "func": "// Store sensor data by topic (skip timer messages)\nif (msg.topic && msg.topic !== \"timer\" && msg.payload !== undefined) {\n    flow.set(\"sensor_\" + msg.topic, msg.payload);\n}\n\n// Read config\nconst soc = flow.get(\"sensor_soc\") || 0;\nconst enabled = flow.get(\"enabled\") || false;\nconst thresholdLow = flow.get(\"threshold_low\") || 40;\nconst thresholdHigh = flow.get(\"threshold_high\") || 60;\nconst voltage = flow.get(\"sensor_batt_voltage\") || 0;\nconst voltageThresholdLow = flow.get(\"voltage_threshold_low\") || 48.0;\nlet state = flow.get(\"state\") || \"SHORE_OFF\";\nconst lastChange = flow.get(\"last_state_change\") || 0;\nconst now = Date.now();\n\n// Collect dashboard data (always sent)\nconst acOutL1 = flow.get(\"sensor_ac_out_l1\") || 0;\nconst acOutL2 = flow.get(\"sensor_ac_out_l2\") || 0;\nconst mpptPower = flow.get(\"sensor_mppt_power\") || 0;\nconst batteryCurrent = flow.get(\"sensor_batt_current\") || 0;\nconst shoreInL1 = flow.get(\"sensor_shore_in_l1\") || 0;\nconst shoreInL2 = flow.get(\"sensor_shore_in_l2\") || 0;\nconst battTempC = flow.get(\"sensor_batt_temp\");\nconst battTempF = battTempC != null ? Math.round(battTempC * 9/5 + 32) : null;\n\nconst dashboard = {\n    state: enabled ? state : \"MANUAL\",\n    soc,\n    enabled,\n    thresholdLow,\n    thresholdHigh,\n    acOutL1,\n    acOutL2,\n    acTotal: acOutL1 + acOutL2,\n    mpptPower,\n    batteryCurrent,\n    shorePower: shoreInL1 + shoreInL2,\n    shoreInL1,\n    shoreInL2,\n    battTempF,\n    voltage: flow.get(\"sensor_batt_voltage\") || 0,\n    voltageThresholdLow,\n    connectReason: flow.get('connect_reason') || null,\n    shoreMode: flow.get('shore_mode') || 'off'\n};\n\n// Only evaluate on timer tick\nif (msg.topic !== \"timer\") {\n    return null;\n}\n\n// Automation disabled \u2014 safe defaults, don't control IgnoreAcIn2\nif (!enabled) {\n    flow.set(\"state\", \"SHORE_OFF\");\n    // out1=null (no IgnoreAcIn2 write), out2=null (relay is manual-only), out3=dashboard\n    return [null, null, { payload: dashboard }];\n}\n\n// Hysteresis with 30s minimum transition interval\nif ((now - lastChange) >= 30000) {\n    if (state === \"SHORE_OFF\" && ((soc > 0 && soc <= thresholdLow) || (voltage > 0 && voltage <= voltageThresholdLow))) {\n        state = \"SHORE_ON\";\n        flow.set(\"last_state_change\", now);\n        flow.set(\"connect_reason\", (soc > 0 && soc <= thresholdLow) ? \"soc\" : \"voltage\");\n        node.warn(\"Transition: SHORE_OFF -> SHORE_ON (SOC=\" + soc + \"%, V=\" + voltage + \"V)\");\n    } else if (state === \"SHORE_ON\" && soc >= thresholdHigh && (voltage === 0 || voltage > voltageThresholdLow)) {\n        state = \"SHORE_OFF\";\n        flow.set(\"last_state_change\", now);\n        node.warn(\"Transition: SHORE_ON -> SHORE_OFF (SOC=\" + soc + \"%, V=\" + voltage + \"V)\");\n    }\n}\nflow.set(\"state\", state);\n\n// Update dashboard state after possible transition\ndashboard.state = state;\n\n// Output control values\nconst ignoreAcIn2 = (state === \"SHORE_ON\") ? 0 : 1;\nreturn [\n    { payload: ignoreAcIn2 },   // out1: IgnoreAcIn2\n    null,                        // out2: relay controlled manually, not by automation\n    { payload: dashboard }       // out3: Dashboard\n];",
+        "func": "// Store sensor data by topic (skip timer messages)\nif (msg.topic && msg.topic !== \"timer\" && msg.payload !== undefined) {\n    flow.set(\"sensor_\" + msg.topic, msg.payload);\n}\n\n// Read config\nconst soc = flow.get(\"sensor_soc\") || 0;\nconst enabled = flow.get(\"enabled\") || false;\nconst thresholdLow = flow.get(\"threshold_low\") || 40;\nconst thresholdHigh = flow.get(\"threshold_high\") || 60;\nconst voltage = flow.get(\"sensor_batt_voltage\") || 0;\nconst voltageThresholdLow = flow.get(\"voltage_threshold_low\") || 48.0;\nlet state = flow.get(\"state\") || \"SHORE_OFF\";\nconst lastChange = flow.get(\"last_state_change\") || 0;\nconst now = Date.now();\n\n// Collect dashboard data (always sent)\nconst acOutL1 = flow.get(\"sensor_ac_out_l1\") || 0;\nconst acOutL2 = flow.get(\"sensor_ac_out_l2\") || 0;\nconst mpptPower = flow.get(\"sensor_mppt_power\") || 0;\nconst batteryCurrent = flow.get(\"sensor_batt_current\") || 0;\nconst shoreInL1 = flow.get(\"sensor_shore_in_l1\") || 0;\nconst shoreInL2 = flow.get(\"sensor_shore_in_l2\") || 0;\nconst battTempC = flow.get(\"sensor_batt_temp\");\nconst battTempF = battTempC != null ? Math.round(battTempC * 9/5 + 32) : null;\n\nconst dashboard = {\n    state: enabled ? state : \"MANUAL\",\n    soc,\n    enabled,\n    thresholdLow,\n    thresholdHigh,\n    acOutL1,\n    acOutL2,\n    acTotal: acOutL1 + acOutL2,\n    mpptPower,\n    batteryCurrent,\n    shorePower: shoreInL1 + shoreInL2,\n    shoreInL1,\n    shoreInL2,\n    battTempF,\n    voltage: flow.get(\"sensor_batt_voltage\") || 0,\n    voltageThresholdLow,\n    connectReason: flow.get('connect_reason') || null,\n    shoreMode: flow.get('shore_mode') || 'off',\n    vebusState: flow.get('sensor_vebus_state')\n};\n\n// Only evaluate on timer tick\nif (msg.topic !== \"timer\") {\n    return null;\n}\n\n// Automation disabled \u2014 safe defaults, don't control IgnoreAcIn2\nif (!enabled) {\n    flow.set(\"state\", \"SHORE_OFF\");\n    // out1=null (no IgnoreAcIn2 write), out2=null (relay is manual-only), out3=dashboard\n    return [null, null, { payload: dashboard }];\n}\n\n// Freeze state machine if VE.Bus is in VEConfigure mode (250) or unavailable\nconst vebusState = flow.get(\"sensor_vebus_state\");\nif (vebusState === 250 || vebusState === null || vebusState === undefined) {\n    dashboard.vebusState = vebusState;\n    node.status({fill: \"red\", shape: \"ring\", text: \"FROZEN \u2014 VE.Bus \" + (vebusState === 250 ? \"VEConfigure\" : \"unavailable\")});\n    return [null, null, { payload: dashboard }];\n}\n\n// Hysteresis with 30s minimum transition interval\nif ((now - lastChange) >= 30000) {\n    if (state === \"SHORE_OFF\" && ((soc > 0 && soc <= thresholdLow) || (voltage > 0 && voltage <= voltageThresholdLow))) {\n        state = \"SHORE_ON\";\n        flow.set(\"last_state_change\", now);\n        flow.set(\"connect_reason\", (soc > 0 && soc <= thresholdLow) ? \"soc\" : \"voltage\");\n        node.warn(\"Transition: SHORE_OFF -> SHORE_ON (SOC=\" + soc + \"%, V=\" + voltage + \"V)\");\n    } else if (state === \"SHORE_ON\" && soc >= thresholdHigh && (voltage === 0 || voltage > voltageThresholdLow)) {\n        state = \"SHORE_OFF\";\n        flow.set(\"last_state_change\", now);\n        node.warn(\"Transition: SHORE_ON -> SHORE_OFF (SOC=\" + soc + \"%, V=\" + voltage + \"V)\");\n    }\n}\nflow.set(\"state\", state);\n\n// Update dashboard state after possible transition\ndashboard.state = state;\n\n// Output control values\nconst ignoreAcIn2 = (state === \"SHORE_ON\") ? 0 : 1;\nreturn [\n    { payload: ignoreAcIn2 },   // out1: IgnoreAcIn2\n    null,                        // out2: relay controlled manually, not by automation\n    { payload: dashboard }       // out3: Dashboard\n];",
         "outputs": 3,
         "timeout": "",
         "noerr": 0,
@@ -483,7 +483,7 @@
         "type": "function",
         "z": "aa00000000000001",
         "name": "Dashboard Formatter",
-        "func": "const d = msg.payload;\nif (!d || typeof d !== \"object\") return null;\n\n// out1: SOC gauge\nconst socMsg = { payload: d.soc };\n\n// out2: Shore status text (HTML with color)\nlet statusText = \"\";\nlet color = \"#4CAF50\";\n\nif (d.shoreMode === \"on\") {\n    statusText = \"Shore connected (manual)\";\n    color = \"#2196F3\";\n} else if (d.shoreMode === \"off\") {\n    statusText = \"Shore disconnected (manual)\";\n    color = \"#9E9E9E\";\n} else if (d.state === \"SHORE_ON\" && d.connectReason === \"soc\") {\n    statusText = \"Shore connected (SOC)\";\n    color = \"#FF9800\";\n} else if (d.state === \"SHORE_ON\" && d.connectReason === \"voltage\") {\n    statusText = \"Shore connected (voltage)\";\n    color = \"#FF9800\";\n} else if (d.state === \"SHORE_ON\") {\n    statusText = \"Shore connected\";\n    color = \"#FF9800\";\n} else if (d.state === \"SHORE_OFF\") {\n    statusText = \"Shore disconnected\";\n    color = \"#4CAF50\";\n}\nconst statusHtml = statusText\n    ? '<span style=\"color:' + color + ';font-size:14px;\">' + statusText + '</span>'\n    : \"\";\n\nreturn [\n    socMsg,\n    { payload: statusHtml },\n    { payload: d.acOutL1 },\n    { payload: d.acOutL2 },\n    { payload: d.shoreInL1 || 0 },\n    { payload: d.shoreInL2 || 0 },\n    { payload: d.mpptPower },\n    { payload: { current: d.batteryCurrent, voltage: d.voltage } }\n];",
+        "func": "const d = msg.payload;\nif (!d || typeof d !== \"object\") return null;\n\n// out1: SOC gauge\nconst socMsg = { payload: d.soc };\n\n// out2: Shore status text (HTML with color)\nlet statusText = \"\";\nlet color = \"#4CAF50\";\nlet warning = \"\";\n\nif (d.vebusState === 250 || d.vebusState === null || d.vebusState === undefined) {\n    warning = '<span style=\"color:#F44336;font-size:14px;\">&#9888; VE.Bus unavailable</span><br>';\n}\n\nif (d.shoreMode === \"on\") {\n    statusText = \"Shore connected (manual)\";\n    color = \"#2196F3\";\n} else if (d.shoreMode === \"off\") {\n    statusText = \"Shore disconnected (manual)\";\n    color = \"#9E9E9E\";\n} else if (d.state === \"SHORE_ON\" && d.connectReason === \"soc\") {\n    statusText = \"Shore connected (SOC)\";\n    color = \"#FF9800\";\n} else if (d.state === \"SHORE_ON\" && d.connectReason === \"voltage\") {\n    statusText = \"Shore connected (voltage)\";\n    color = \"#FF9800\";\n} else if (d.state === \"SHORE_ON\") {\n    statusText = \"Shore connected\";\n    color = \"#FF9800\";\n} else if (d.state === \"SHORE_OFF\") {\n    statusText = \"Shore disconnected\";\n    color = \"#4CAF50\";\n}\nconst statusHtml = warning + (statusText\n    ? '<span style=\"color:' + color + ';font-size:14px;\">' + statusText + '</span>'\n    : \"\");\n\nreturn [\n    socMsg,\n    { payload: statusHtml },\n    { payload: d.acOutL1 },\n    { payload: d.acOutL2 },\n    { payload: d.shoreInL1 || 0 },\n    { payload: d.shoreInL2 || 0 },\n    { payload: d.mpptPower },\n    { payload: { current: d.batteryCurrent, voltage: d.voltage } }\n];",
         "outputs": 8,
         "timeout": "",
         "noerr": 0,
@@ -1202,7 +1202,7 @@
         "topicType": "str",
         "thumbLabel": "always",
         "showTicks": "always",
-        "min": 10,
+        "min": 0,
         "max": 50,
         "step": 0.5,
         "className": "",
@@ -1219,7 +1219,7 @@
         "type": "function",
         "z": "aa00000000000001",
         "name": "Set AC Limit Handler",
-        "func": "const val = Math.max(10, Math.min(50, Number(msg.payload)));\nflow.set('ac_limit', val);\nnode.status({fill: 'blue', shape: 'dot', text: val + 'A'});\nmsg.payload = val;\nreturn msg;",
+        "func": "const val = Number(msg.payload);\nflow.set('ac_limit', val);\nnode.status({fill: 'blue', shape: 'dot', text: val + 'A'});\nmsg.payload = val;\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -1311,13 +1311,15 @@
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
-        "initialize": "",
+        "initialize": "const limit = flow.get('ac_limit');\nif (limit !== undefined) {\n    node.send({payload: limit});\n    node.status({fill: 'blue', shape: 'dot', text: limit + 'A (restored)'});\n}",
         "finalize": "",
         "libs": [],
         "x": 380,
         "y": 700,
         "wires": [
-            []
+            [
+                "aa000000000000e5"
+            ]
         ]
     },
     {
@@ -1476,5 +1478,31 @@
         "y": 280,
         "wires": [],
         "fontSize": 14
+    },
+    {
+        "id": "aa000000000000fb",
+        "type": "victron-input-vebus",
+        "z": "aa00000000000001",
+        "name": "vebus_state",
+        "service": "com.victronenergy.vebus/276",
+        "path": "/State",
+        "serviceObj": {
+            "service": "com.victronenergy.vebus/276",
+            "name": "Quattro 48/5000/70-2x100 120V"
+        },
+        "pathObj": {
+            "path": "/State",
+            "type": "float",
+            "name": "VE.Bus state"
+        },
+        "onlyChanges": false,
+        "roundValues": "0",
+        "x": 130,
+        "y": 250,
+        "wires": [
+            [
+                "aa00000000000030"
+            ]
+        ]
     }
 ]

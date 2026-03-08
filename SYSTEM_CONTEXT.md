@@ -33,8 +33,9 @@
 
 ### Cerbo GX
 - Venus OS v3.70
-- **Relay 0**: `/Settings/Relay/Function` = 0 (Alarm) — **do not repurpose**
-- **Relay 1**: `/Settings/Relay/1/Function` = 2 (Manual) — **used for charger disable**
+- **Physical Relay 1** (DBUS Relay 0): `/Settings/Relay/Function` = 0 (Alarm) — **do not repurpose**
+- **Physical Relay 2** (DBUS Relay 1): `/Settings/Relay/1/Function` = 2 (Manual) — **used for charger disable**
+- Note: Cerbo physical relay labels are 1-indexed; DBUS paths are 0-indexed
 - DBUS relay control: `com.victronenergy.system /Relay/1/State` (0=open, 1=closed)
 
 ### AC Inputs
@@ -269,29 +270,53 @@ dbus -y com.victronenergy.vebus.ttyS4 /Ac/State/IgnoreAcIn2 GetValue
 ## Configuration Still Required (User Action)
 
 ### 1. Install Charge Current Control Assistant on both Quattros
-Via VEConfigure + MK3-USB cable, connect to each Quattro individually:
-- Assistants tab → Add → "Charge Current Control"
-- Input: **AUX1**
-- Enable: **"Disable the charger at 0A charge current"**
-- Both trigger voltage thresholds: **~2V** (ensures dry-contact on/off behavior)
-- Disable Virtual Switch first if enabled (VS and Assistants are mutually exclusive)
-- Program each Quattro separately; reboot after both are done
 
-### 2. Wire Cerbo Relay 1 → Both Quattros' AUX1 Inputs
+Via VEConfigure + MK3-USB cable, connect to each Quattro individually.
+Disable Virtual Switch first if enabled (VS and Assistants are mutually exclusive).
+
+**Step-by-step in VEConfigure:**
+
+1. Assistants tab → Add → **"Charge Current Control"**
+
+2. **"When to change the DC charge current?"**
+   - Select: **"when AC Input 2 is active"**
+
+3. **"Select how the charge current should be changed"**
+   - Select: **"Change the charge current based on voltage on auxiliary input 1"**
+
+4. **"DC charge current regulation"**
+   | Row | Charge current | Voltage threshold |
+   |-----|---------------|-------------------|
+   | Low (relay closed = charger off) | **0 A** | **2.00 V** |
+   | High (relay open = charger on) | **52 A** | **4.00 V** |
+
+   AUX1 has an internal 5V pull-up. Relay closed shorts AUX1 to ground (~0V, below 2V → 0A).
+   Relay open leaves AUX1 pulled up (~5V, above 4V → 52A = normal max).
+
+5. **"Disable charger"**
+   - Check: **"Disable the charger when charge current should be zero."**
+   - Without this, a small trickle current still flows from AC to battery at 0A.
+
+6. Program the **master** Quattro.
+7. Connect to the **slave** Quattro — it only presents the "Disable the charger
+   when charge current should be zero" checkbox (no other settings). Check it.
+8. Reboot after both are done.
+
+### 2. Wire Cerbo Physical Relay 2 → Master Quattro AUX1
+
+Only the master needs wiring — the slave follows the master's charge current via VE.Bus.
+Physical Relay 2 = DBUS Relay 1 (`/Relay/1/State`).
 
 ```
-Cerbo GX Relay 1                 Quattro #1 AUX1    Quattro #2 AUX1
-  COM ──────────────┬──────────── Terminal 1 ─┐
-                    │                         │
-                    └──────────── Terminal 1 ─┘
-  NO  ──────────────┬──────────── Terminal 2 ─┐
-                    │                         │
-                    └──────────── Terminal 2 ─┘
+Cerbo GX Physical Relay 2       Master Quattro AUX1
+  COM ──────────────────────────── + or -  (polarity doesn't matter)
+  NO  ──────────────────────────── + or -
 ```
 
 - Dry contact only — AUX1 has internal 5V pull-up, no external power needed
-- Relay energized (Node-RED writes 1) → contacts close → AUX1 shorted → charger disabled
-- Relay de-energized (0) → contacts open → AUX1 open → charger enabled
+- Polarity doesn't matter — relay is a dry contact, AUX1 just measures voltage across its terminals
+- Relay energized (Node-RED writes 1) → contacts close → AUX1 shorted (~0V) → charger disabled
+- Relay de-energized (0) → contacts open → AUX1 pulled up (~5V) → charger enabled
 
 ### 3. Verify After Wiring
 ```bash
