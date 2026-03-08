@@ -1,0 +1,5 @@
+# Transient change scripts
+tmp/
+
+# Claude Code local settings
+.claude/

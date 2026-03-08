@@ -1,0 +1,1480 @@
+[
+    {
+        "id": "victron-client-id",
+        "type": "victron-client",
+        "showValues": true,
+        "contextStore": true,
+        "enablePolling": false
+    },
+    {
+        "id": "67decbab6d68dbbb",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "caee0d76ace3ce25",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "aa00000000000001",
+        "type": "tab",
+        "label": "Power Manager",
+        "disabled": false,
+        "info": "Power management dashboard with shore automation, charger control, and battery monitoring.",
+        "env": []
+    },
+    {
+        "id": "aa00000000000010",
+        "type": "ui-page",
+        "name": "Power Manager",
+        "ui": "67decbab6d68dbbb",
+        "path": "/power-manager",
+        "icon": "mdi-power-plug",
+        "layout": "grid",
+        "theme": "caee0d76ace3ce25",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Tablet",
+                "px": 576,
+                "cols": 6
+            },
+            {
+                "name": "Small Desktop",
+                "px": 768,
+                "cols": 9
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "aa000000000000e0",
+        "type": "ui-group",
+        "name": "Battery",
+        "page": "aa00000000000010",
+        "width": 3,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "aa000000000000e1",
+        "type": "ui-group",
+        "name": "AC & Shore",
+        "page": "aa00000000000010",
+        "width": 6,
+        "height": 1,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "aa000000000000e2",
+        "type": "ui-group",
+        "name": "Solar",
+        "page": "aa00000000000010",
+        "width": 3,
+        "height": 1,
+        "order": 3,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "aa00000000000012",
+        "type": "ui-group",
+        "name": "Shore Control",
+        "page": "aa00000000000010",
+        "width": 6,
+        "height": 1,
+        "order": 5,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "aa00000000000013",
+        "type": "ui-group",
+        "name": "Thresholds",
+        "page": "aa00000000000010",
+        "width": 6,
+        "height": 1,
+        "order": 6,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "aa00000000000020",
+        "type": "victron-input-system",
+        "z": "aa00000000000001",
+        "name": "soc",
+        "service": "com.victronenergy.system/0",
+        "path": "/Dc/Battery/Soc",
+        "serviceObj": {
+            "service": "com.victronenergy.system/0",
+            "name": "Venus system"
+        },
+        "pathObj": {
+            "path": "/Dc/Battery/Soc",
+            "type": "float",
+            "name": "Battery State of Charge (%)"
+        },
+        "onlyChanges": false,
+        "roundValues": "1",
+        "x": 130,
+        "y": 80,
+        "wires": [
+            [
+                "aa00000000000030"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000021",
+        "type": "victron-input-system",
+        "z": "aa00000000000001",
+        "name": "batt_current",
+        "service": "com.victronenergy.system/0",
+        "path": "/Dc/Battery/Current",
+        "serviceObj": {
+            "service": "com.victronenergy.system/0",
+            "name": "Venus system"
+        },
+        "pathObj": {
+            "path": "/Dc/Battery/Current",
+            "type": "float",
+            "name": "Battery current (A)"
+        },
+        "onlyChanges": false,
+        "roundValues": "1",
+        "x": 130,
+        "y": 140,
+        "wires": [
+            [
+                "aa00000000000030"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000022",
+        "type": "victron-input-vebus",
+        "z": "aa00000000000001",
+        "name": "ac_out_l1",
+        "service": "com.victronenergy.vebus/276",
+        "path": "/Ac/Out/L1/P",
+        "serviceObj": {
+            "service": "com.victronenergy.vebus/276",
+            "name": "Quattro 48/5000/70-2x100 120V"
+        },
+        "pathObj": {
+            "path": "/Ac/Out/L1/P",
+            "type": "float",
+            "name": "Output power phase L1 (W)"
+        },
+        "onlyChanges": false,
+        "roundValues": "0",
+        "x": 130,
+        "y": 200,
+        "wires": [
+            [
+                "aa00000000000030"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000023",
+        "type": "victron-input-vebus",
+        "z": "aa00000000000001",
+        "name": "ac_out_l2",
+        "service": "com.victronenergy.vebus/276",
+        "path": "/Ac/Out/L2/P",
+        "serviceObj": {
+            "service": "com.victronenergy.vebus/276",
+            "name": "Quattro 48/5000/70-2x100 120V"
+        },
+        "pathObj": {
+            "path": "/Ac/Out/L2/P",
+            "type": "float",
+            "name": "Output power phase L2 (W)"
+        },
+        "onlyChanges": false,
+        "roundValues": "0",
+        "x": 130,
+        "y": 260,
+        "wires": [
+            [
+                "aa00000000000030"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000024",
+        "type": "victron-input-solarcharger",
+        "z": "aa00000000000001",
+        "name": "mppt_power",
+        "service": "com.victronenergy.solarcharger/0",
+        "path": "/Yield/Power",
+        "serviceObj": {
+            "service": "com.victronenergy.solarcharger/0",
+            "name": "SmartSolar MPPT VE.Can 150/100 rev2"
+        },
+        "pathObj": {
+            "path": "/Yield/Power",
+            "type": "float",
+            "name": "PV Power (W)"
+        },
+        "onlyChanges": false,
+        "roundValues": "0",
+        "x": 130,
+        "y": 320,
+        "wires": [
+            [
+                "aa00000000000030"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000026",
+        "type": "victron-input-vebus",
+        "z": "aa00000000000001",
+        "name": "shore_in_l1",
+        "service": "com.victronenergy.vebus/276",
+        "path": "/Ac/ActiveIn/L1/P",
+        "serviceObj": {
+            "service": "com.victronenergy.vebus/276",
+            "name": "Quattro 48/5000/70-2x100 120V"
+        },
+        "pathObj": {
+            "path": "/Ac/ActiveIn/L1/P",
+            "type": "float",
+            "name": "Input power phase 1 (W)"
+        },
+        "onlyChanges": false,
+        "roundValues": "0",
+        "x": 130,
+        "y": 370,
+        "wires": [
+            [
+                "aa00000000000030"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000027",
+        "type": "victron-input-vebus",
+        "z": "aa00000000000001",
+        "name": "shore_in_l2",
+        "service": "com.victronenergy.vebus/276",
+        "path": "/Ac/ActiveIn/L2/P",
+        "serviceObj": {
+            "service": "com.victronenergy.vebus/276",
+            "name": "Quattro 48/5000/70-2x100 120V"
+        },
+        "pathObj": {
+            "path": "/Ac/ActiveIn/L2/P",
+            "type": "float",
+            "name": "Input power phase 2 (W)"
+        },
+        "onlyChanges": false,
+        "roundValues": "0",
+        "x": 130,
+        "y": 430,
+        "wires": [
+            [
+                "aa00000000000030"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000d1",
+        "type": "victron-input-system",
+        "z": "aa00000000000001",
+        "name": "batt_temp",
+        "service": "com.victronenergy.system/0",
+        "path": "/Dc/Battery/Temperature",
+        "serviceObj": {
+            "service": "com.victronenergy.system/0",
+            "name": "Venus system"
+        },
+        "pathObj": {
+            "path": "/Dc/Battery/Temperature",
+            "type": "float",
+            "name": "Battery temperature (C)"
+        },
+        "onlyChanges": false,
+        "roundValues": "1",
+        "x": 130,
+        "y": 490,
+        "wires": [
+            [
+                "aa00000000000030"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000025",
+        "type": "inject",
+        "z": "aa00000000000001",
+        "name": "5s Timer",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str",
+                "v": "timer"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "timer",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 130,
+        "y": 400,
+        "wires": [
+            [
+                "aa00000000000030"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000030",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "State Machine",
+        "func": "// Store sensor data by topic (skip timer messages)\nif (msg.topic && msg.topic !== \"timer\" && msg.payload !== undefined) {\n    flow.set(\"sensor_\" + msg.topic, msg.payload);\n}\n\n// Read config\nconst soc = flow.get(\"sensor_soc\") || 0;\nconst enabled = flow.get(\"enabled\") || false;\nconst thresholdLow = flow.get(\"threshold_low\") || 40;\nconst thresholdHigh = flow.get(\"threshold_high\") || 60;\nconst voltage = flow.get(\"sensor_batt_voltage\") || 0;\nconst voltageThresholdLow = flow.get(\"voltage_threshold_low\") || 48.0;\nlet state = flow.get(\"state\") || \"SHORE_OFF\";\nconst lastChange = flow.get(\"last_state_change\") || 0;\nconst now = Date.now();\n\n// Collect dashboard data (always sent)\nconst acOutL1 = flow.get(\"sensor_ac_out_l1\") || 0;\nconst acOutL2 = flow.get(\"sensor_ac_out_l2\") || 0;\nconst mpptPower = flow.get(\"sensor_mppt_power\") || 0;\nconst batteryCurrent = flow.get(\"sensor_batt_current\") || 0;\nconst shoreInL1 = flow.get(\"sensor_shore_in_l1\") || 0;\nconst shoreInL2 = flow.get(\"sensor_shore_in_l2\") || 0;\nconst battTempC = flow.get(\"sensor_batt_temp\");\nconst battTempF = battTempC != null ? Math.round(battTempC * 9/5 + 32) : null;\n\nconst dashboard = {\n    state: enabled ? state : \"MANUAL\",\n    soc,\n    enabled,\n    thresholdLow,\n    thresholdHigh,\n    acOutL1,\n    acOutL2,\n    acTotal: acOutL1 + acOutL2,\n    mpptPower,\n    batteryCurrent,\n    shorePower: shoreInL1 + shoreInL2,\n    shoreInL1,\n    shoreInL2,\n    battTempF,\n    voltage: flow.get(\"sensor_batt_voltage\") || 0,\n    voltageThresholdLow,\n    connectReason: flow.get('connect_reason') || null,\n    shoreMode: flow.get('shore_mode') || 'off'\n};\n\n// Only evaluate on timer tick\nif (msg.topic !== \"timer\") {\n    return null;\n}\n\n// Automation disabled \u2014 safe defaults, don't control IgnoreAcIn2\nif (!enabled) {\n    flow.set(\"state\", \"SHORE_OFF\");\n    // out1=null (no IgnoreAcIn2 write), out2=null (relay is manual-only), out3=dashboard\n    return [null, null, { payload: dashboard }];\n}\n\n// Hysteresis with 30s minimum transition interval\nif ((now - lastChange) >= 30000) {\n    if (state === \"SHORE_OFF\" && ((soc > 0 && soc <= thresholdLow) || (voltage > 0 && voltage <= voltageThresholdLow))) {\n        state = \"SHORE_ON\";\n        flow.set(\"last_state_change\", now);\n        flow.set(\"connect_reason\", (soc > 0 && soc <= thresholdLow) ? \"soc\" : \"voltage\");\n        node.warn(\"Transition: SHORE_OFF -> SHORE_ON (SOC=\" + soc + \"%, V=\" + voltage + \"V)\");\n    } else if (state === \"SHORE_ON\" && soc >= thresholdHigh && (voltage === 0 || voltage > voltageThresholdLow)) {\n        state = \"SHORE_OFF\";\n        flow.set(\"last_state_change\", now);\n        node.warn(\"Transition: SHORE_ON -> SHORE_OFF (SOC=\" + soc + \"%, V=\" + voltage + \"V)\");\n    }\n}\nflow.set(\"state\", state);\n\n// Update dashboard state after possible transition\ndashboard.state = state;\n\n// Output control values\nconst ignoreAcIn2 = (state === \"SHORE_ON\") ? 0 : 1;\nreturn [\n    { payload: ignoreAcIn2 },   // out1: IgnoreAcIn2\n    null,                        // out2: relay controlled manually, not by automation\n    { payload: dashboard }       // out3: Dashboard\n];",
+        "outputs": 3,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "// Set defaults for missing keys only (preserve state across deploys)\n// Migrate old state names\nif (flow.get('state') === 'SOLAR_ONLY') flow.set('state', 'SHORE_OFF');\nif (flow.get('state') === 'GRID_ASSIST') flow.set('state', 'SHORE_ON');\nif (flow.get('state') === undefined) flow.set('state', 'SHORE_OFF');\nif (flow.get('enabled') === undefined) flow.set('enabled', false);\nif (flow.get('shore_mode') === undefined) flow.set('shore_mode', 'off');\nif (flow.get('threshold_low') === undefined) flow.set('threshold_low', 40);\nif (flow.get('threshold_high') === undefined) flow.set('threshold_high', 60);\nif (flow.get('voltage_threshold_low') === undefined) flow.set('voltage_threshold_low', 48.0);\nif (flow.get('last_state_change') === undefined) flow.set('last_state_change', 0);\nif (flow.get('manual_relay') === undefined) flow.set('manual_relay', false);",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 240,
+        "wires": [
+            [
+                "aa00000000000040"
+            ],
+            [
+                "aa00000000000041"
+            ],
+            [
+                "aa00000000000050",
+                "aa00000000000060",
+                "aa000000000000a0",
+                "aa000000000000c2",
+                "aa000000000000d0",
+                "aa000000000000e8"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000040",
+        "type": "victron-output-custom",
+        "z": "aa00000000000001",
+        "name": "Set IgnoreAcIn2",
+        "service": "com.victronenergy.vebus/276",
+        "path": "/Ac/Control/IgnoreAcIn2",
+        "serviceObj": {
+            "service": "com.victronenergy.vebus/276",
+            "name": "Quattro 48/5000/70-2x100 120V"
+        },
+        "pathObj": {
+            "path": "/Ac/Control/IgnoreAcIn2",
+            "type": "enum",
+            "name": "Ignore AC Input 2",
+            "enum": {
+                "0": "Accept AC Input",
+                "1": "Ignore AC Input"
+            }
+        },
+        "initial": "",
+        "x": 710,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "aa00000000000041",
+        "type": "victron-output-relay",
+        "z": "aa00000000000001",
+        "name": "Set Relay 1 (Charger Disable)",
+        "service": "com.victronenergy.system/0",
+        "path": "/Relay/1/State",
+        "serviceObj": {
+            "service": "com.victronenergy.system/0",
+            "name": "Venus device"
+        },
+        "pathObj": {
+            "path": "/Relay/1/State",
+            "type": "enum",
+            "name": "Venus relay 2 state",
+            "enum": {
+                "0": "Open",
+                "1": "Closed"
+            }
+        },
+        "initial": "",
+        "x": 740,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "aa00000000000050",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Dashboard Formatter",
+        "func": "const d = msg.payload;\nif (!d || typeof d !== \"object\") return null;\n\n// out1: SOC gauge\nconst socMsg = { payload: d.soc };\n\n// out2: Shore status text (HTML with color)\nlet statusText = \"\";\nlet color = \"#4CAF50\";\n\nif (d.shoreMode === \"on\") {\n    statusText = \"Shore connected (manual)\";\n    color = \"#2196F3\";\n} else if (d.shoreMode === \"off\") {\n    statusText = \"Shore disconnected (manual)\";\n    color = \"#9E9E9E\";\n} else if (d.state === \"SHORE_ON\" && d.connectReason === \"soc\") {\n    statusText = \"Shore connected (SOC)\";\n    color = \"#FF9800\";\n} else if (d.state === \"SHORE_ON\" && d.connectReason === \"voltage\") {\n    statusText = \"Shore connected (voltage)\";\n    color = \"#FF9800\";\n} else if (d.state === \"SHORE_ON\") {\n    statusText = \"Shore connected\";\n    color = \"#FF9800\";\n} else if (d.state === \"SHORE_OFF\") {\n    statusText = \"Shore disconnected\";\n    color = \"#4CAF50\";\n}\nconst statusHtml = statusText\n    ? '<span style=\"color:' + color + ';font-size:14px;\">' + statusText + '</span>'\n    : \"\";\n\nreturn [\n    socMsg,\n    { payload: statusHtml },\n    { payload: d.acOutL1 },\n    { payload: d.acOutL2 },\n    { payload: d.shoreInL1 || 0 },\n    { payload: d.shoreInL2 || 0 },\n    { payload: d.mpptPower },\n    { payload: { current: d.batteryCurrent, voltage: d.voltage } }\n];",
+        "outputs": 8,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 380,
+        "wires": [
+            [
+                "aa00000000000070"
+            ],
+            [
+                "aa000000000000f5"
+            ],
+            [
+                "aa00000000000072"
+            ],
+            [
+                "aa000000000000b0"
+            ],
+            [
+                "aa00000000000075"
+            ],
+            [
+                "aa000000000000b1"
+            ],
+            [
+                "aa00000000000073"
+            ],
+            [
+                "aa00000000000074"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000060",
+        "type": "debug",
+        "z": "aa00000000000001",
+        "name": "State Debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload.state",
+        "statusType": "auto",
+        "x": 680,
+        "y": 310,
+        "wires": []
+    },
+    {
+        "id": "aa00000000000070",
+        "type": "ui-gauge",
+        "z": "aa00000000000001",
+        "name": "SOC Gauge",
+        "group": "aa000000000000e0",
+        "order": 1,
+        "width": 3,
+        "height": 4,
+        "gtype": "gauge-half",
+        "gstyle": "rounded",
+        "title": "Battery SOC",
+        "units": "%",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": 0,
+                "color": "#f44336"
+            },
+            {
+                "from": 20,
+                "color": "#FF9800"
+            },
+            {
+                "from": 40,
+                "color": "#FFEB3B"
+            },
+            {
+                "from": 60,
+                "color": "#4CAF50"
+            }
+        ],
+        "min": 0,
+        "max": 100,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 700,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "aa00000000000072",
+        "type": "ui-gauge",
+        "z": "aa00000000000001",
+        "group": "aa000000000000e1",
+        "order": 3,
+        "width": 3,
+        "height": 4,
+        "name": "AC Out L1 Gauge",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "className": "",
+        "x": 690,
+        "y": 460,
+        "wires": [],
+        "gtype": "gauge-half",
+        "gstyle": "rounded",
+        "title": "AC Out L1",
+        "units": "W",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": 0,
+                "color": "#4CAF50"
+            },
+            {
+                "from": 2500,
+                "color": "#FF9800"
+            },
+            {
+                "from": 4000,
+                "color": "#f44336"
+            }
+        ],
+        "min": 0,
+        "max": 5000,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false
+    },
+    {
+        "id": "aa00000000000073",
+        "type": "ui-gauge",
+        "z": "aa00000000000001",
+        "group": "aa000000000000e2",
+        "order": 1,
+        "width": 3,
+        "height": 8,
+        "name": "Solar Gauge",
+        "style": false,
+        "className": "",
+        "x": 700,
+        "y": 500,
+        "wires": [],
+        "gtype": "gauge-half",
+        "gstyle": "rounded",
+        "title": "Solar",
+        "units": "W",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": 0,
+                "color": "#9E9E9E"
+            },
+            {
+                "from": 500,
+                "color": "#FFEB3B"
+            },
+            {
+                "from": 2000,
+                "color": "#4CAF50"
+            }
+        ],
+        "min": 0,
+        "max": 5000,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false
+    },
+    {
+        "id": "aa00000000000074",
+        "type": "ui-template",
+        "z": "aa00000000000001",
+        "group": "aa000000000000e0",
+        "order": 2,
+        "width": 3,
+        "height": 4,
+        "name": "Battery Info Widget",
+        "format": "<template>\n  <div style=\"display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:8px;box-sizing:border-box;\">\n    <div style=\"display:flex;align-items:baseline;gap:12px;margin-bottom:2px;\">\n      <div style=\"font-size:13px;color:#717171;font-family:Arial;\">Battery</div>\n      <div style=\"font-size:13px;color:#9e9e9e;font-family:Arial;\">{{ formatVoltage(msg.payload) }}</div>\n    </div>\n    <div :style=\"{fontSize:'32px',fontWeight:'bold',fontFamily:'Arial',color:getColor(msg.payload),marginBottom:'8px'}\">{{ formatCurrent(msg.payload) }}</div>\n    <div style=\"position:relative;width:90%;height:14px;background:#e0e0e0;border-radius:7px;overflow:hidden;\">\n      <div style=\"position:absolute;left:50%;top:0;width:2px;height:100%;background:#9e9e9e;transform:translateX(-50%);z-index:1;\"></div>\n      <div :style=\"getBarStyle(msg.payload)\"></div>\n    </div>\n    <div style=\"display:flex;justify-content:space-between;width:90%;margin-top:3px;font-size:10px;color:#9e9e9e;font-family:Arial;\">\n      <span>-200A</span><span>0</span><span>+200A</span>\n    </div>\n  </div>\n</template>\n<script>\nexport default {\n  methods: {\n    getCurrent(v) {\n      if (v == null) return 0\n      return typeof v === 'object' ? Number(v.current || 0) : Number(v)\n    },\n    formatCurrent(v) {\n      const a = this.getCurrent(v)\n      return (a >= 0 ? '+' : '') + a.toFixed(0) + ' A'\n    },\n    formatVoltage(v) {\n      if (v == null || typeof v !== 'object' || v.voltage == null) return ''\n      return Number(v.voltage).toFixed(1) + 'V'\n    },\n    getColor(v) {\n      const a = this.getCurrent(v)\n      if (a < -50) return '#1565C0'\n      if (a < -10) return '#42A5F5'\n      if (a <  10) return '#78909C'\n      return '#4CAF50'\n    },\n    getBarStyle(v) {\n      const max = 200\n      const a = this.getCurrent(v)\n      const pct = Math.min(Math.abs(a) / max, 1) * 50\n      const c = this.getColor(v)\n      return a >= 0\n        ? { position:'absolute', left:'50%', width:pct+'%', height:'100%', background:c, borderRadius:'0 7px 7px 0', transition:'width 0.4s ease' }\n        : { position:'absolute', right:'50%', width:pct+'%', height:'100%', background:c, borderRadius:'7px 0 0 7px', transition:'width 0.4s ease' }\n    }\n  }\n}\n</script>",
+        "templateScope": "local",
+        "storeState": false,
+        "className": "",
+        "x": 710,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "aa00000000000075",
+        "type": "ui-gauge",
+        "z": "aa00000000000001",
+        "group": "aa000000000000e1",
+        "order": 1,
+        "width": 3,
+        "height": 4,
+        "name": "Shore In L1 Gauge",
+        "style": false,
+        "className": "",
+        "x": 720,
+        "y": 580,
+        "wires": [],
+        "gtype": "gauge-half",
+        "gstyle": "rounded",
+        "title": "Shore In L1",
+        "units": "W",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": 0,
+                "color": "#4CAF50"
+            },
+            {
+                "from": 3000,
+                "color": "#FF9800"
+            },
+            {
+                "from": 5000,
+                "color": "#f44336"
+            }
+        ],
+        "min": 0,
+        "max": 6000,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false
+    },
+    {
+        "id": "aa00000000000081",
+        "type": "ui-slider",
+        "z": "aa00000000000001",
+        "name": "Low Threshold",
+        "group": "aa00000000000013",
+        "order": 1,
+        "width": 6,
+        "height": 1,
+        "label": "Connect Shore (SOC %)",
+        "tooltip": "Connect shore power when SOC drops to this level",
+        "passthru": false,
+        "outs": "end",
+        "topic": "threshold_low",
+        "topicType": "str",
+        "thumbLabel": "always",
+        "showTicks": "always",
+        "min": 10,
+        "max": 90,
+        "step": 1,
+        "className": "",
+        "x": 150,
+        "y": 560,
+        "wires": [
+            [
+                "aa00000000000086"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000086",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Set Low Threshold",
+        "func": "const high = flow.get('threshold_high') || 60;\nconst currentLow = flow.get('threshold_low') || 40;\nif (msg.payload > high - 1) {\n    node.status({fill: 'red', shape: 'dot', text: currentLow + '% (rejected)'});\n    msg.payload = '\u26a0\ufe0f Rejected \u2014 Connect must be \u2264 ' + (high - 1) + '%';\n    return msg;\n}\nflow.set('threshold_low', msg.payload);\nnode.status({fill: 'green', shape: 'dot', text: msg.payload + '%'});\nconst vt = flow.get('voltage_threshold_low') || 48.0;\nmsg.payload = 'Connect: ' + msg.payload + '% or \\u2264' + vt.toFixed(1) + 'V \u2192 Disconnect: ' + high + '%';\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 560,
+        "wires": [
+            [
+                "aa000000000000a1"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000082",
+        "type": "ui-slider",
+        "z": "aa00000000000001",
+        "name": "High Threshold",
+        "group": "aa00000000000013",
+        "order": 2,
+        "width": 6,
+        "height": 1,
+        "label": "Disconnect Shore (SOC %)",
+        "tooltip": "Disconnect shore power when SOC reaches this level",
+        "passthru": false,
+        "outs": "end",
+        "topic": "threshold_high",
+        "topicType": "str",
+        "thumbLabel": "always",
+        "showTicks": "always",
+        "min": 10,
+        "max": 90,
+        "step": 1,
+        "className": "",
+        "x": 150,
+        "y": 620,
+        "wires": [
+            [
+                "aa00000000000087"
+            ]
+        ]
+    },
+    {
+        "id": "aa00000000000087",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Set High Threshold",
+        "func": "const low = flow.get('threshold_low') || 40;\nconst currentHigh = flow.get('threshold_high') || 60;\nif (msg.payload < low + 1) {\n    node.status({fill: 'red', shape: 'dot', text: currentHigh + '% (rejected)'});\n    msg.payload = '\u26a0\ufe0f Rejected \u2014 Disconnect must be \u2265 ' + (low + 1) + '%';\n    return msg;\n}\nflow.set('threshold_high', msg.payload);\nnode.status({fill: 'green', shape: 'dot', text: msg.payload + '%'});\nconst vt = flow.get('voltage_threshold_low') || 48.0;\nmsg.payload = 'Connect: ' + low + '% or \\u2264' + vt.toFixed(1) + 'V \u2192 Disconnect: ' + msg.payload + '%';\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 620,
+        "wires": [
+            [
+                "aa000000000000a1"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000a0",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Threshold Text",
+        "func": "const d = msg.payload;\nconst vt = flow.get('voltage_threshold_low') || 48.0;\nmsg.payload = 'Connect: ' + d.thresholdLow + '% or \\u2264' + vt.toFixed(1) + 'V \u2192 Disconnect: ' + d.thresholdHigh + '%';\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 200,
+        "y": 720,
+        "wires": [
+            [
+                "aa000000000000a1"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000a1",
+        "type": "ui-text",
+        "z": "aa00000000000001",
+        "group": "aa00000000000013",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "Threshold Status",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "style": false,
+        "font": "",
+        "fontSize": 14,
+        "color": "#717171",
+        "className": "",
+        "x": 430,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "aa000000000000b0",
+        "type": "ui-gauge",
+        "z": "aa00000000000001",
+        "name": "AC Out L2 Gauge",
+        "group": "aa000000000000e1",
+        "order": 4,
+        "width": 3,
+        "height": 4,
+        "gtype": "gauge-half",
+        "gstyle": "rounded",
+        "title": "AC Out L2",
+        "units": "W",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": 0,
+                "color": "#4CAF50"
+            },
+            {
+                "from": 2500,
+                "color": "#FF9800"
+            },
+            {
+                "from": 4000,
+                "color": "#f44336"
+            }
+        ],
+        "min": 0,
+        "max": 5000,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 900,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "aa000000000000b1",
+        "type": "ui-gauge",
+        "z": "aa00000000000001",
+        "name": "Shore In L2 Gauge",
+        "group": "aa000000000000e1",
+        "order": 2,
+        "width": 3,
+        "height": 4,
+        "gtype": "gauge-half",
+        "gstyle": "rounded",
+        "title": "Shore In L2",
+        "units": "W",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": 0,
+                "color": "#4CAF50"
+            },
+            {
+                "from": 3000,
+                "color": "#FF9800"
+            },
+            {
+                "from": 5000,
+                "color": "#f44336"
+            }
+        ],
+        "min": 0,
+        "max": 6000,
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 900,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "aa000000000000c0",
+        "type": "ui-group",
+        "name": "History",
+        "page": "aa00000000000010",
+        "width": 12,
+        "height": 1,
+        "order": 4,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "aa000000000000c2",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Chart Formatter",
+        "func": "const d = msg.payload;\nif (!d || typeof d !== 'object') return null;\nconst t = Date.now();\n// SOC chart: always include SOC, add temp if available\nconst socSeries = [ { topic: 'SOC (%)', payload: d.soc, x: t } ];\nif (d.battTempF != null) socSeries.push({ topic: 'Temp (F)', payload: d.battTempF, x: t });\nreturn [\n    socSeries,\n    [ { topic: 'Solar (W)', payload: d.mpptPower,                              x: t },\n      { topic: 'AC In (W)', payload: (d.shoreInL1||0) + (d.shoreInL2||0),     x: t },\n      { topic: 'AC Out (W)',payload: (d.acOutL1  ||0) + (d.acOutL2  ||0),     x: t } ]\n];",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 200,
+        "y": 800,
+        "wires": [
+            [
+                "aa000000000000c1"
+            ],
+            [
+                "aa000000000000c3"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000c1",
+        "type": "ui-chart",
+        "z": "aa00000000000001",
+        "group": "aa000000000000c0",
+        "name": "SOC History",
+        "label": "Battery SOC",
+        "order": 1,
+        "width": 6,
+        "height": 8,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xAxisTimeFormat": "HH:mm",
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": "3",
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#4CAF50",
+            "#FF5722",
+            "#4CAF50"
+        ],
+        "textSizeValue": 12,
+        "textType": "px",
+        "interpolation": "bezier",
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "false",
+        "pointRadius": 2,
+        "lineWidth": 2,
+        "showLegend": true,
+        "legend": "visible",
+        "className": "",
+        "x": 430,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "aa000000000000c3",
+        "type": "ui-chart",
+        "z": "aa00000000000001",
+        "group": "aa000000000000c0",
+        "name": "Power History",
+        "label": "Solar & Load",
+        "order": 2,
+        "width": 6,
+        "height": 8,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xAxisTimeFormat": "HH:mm",
+        "ymin": "0",
+        "ymax": "12000",
+        "removeOlder": "3",
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#FFEB3B",
+            "#2196F3",
+            "#FF9800"
+        ],
+        "textSizeValue": 12,
+        "textType": "px",
+        "interpolation": "bezier",
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "false",
+        "pointRadius": 2,
+        "lineWidth": 2,
+        "showLegend": true,
+        "legend": "visible",
+        "className": "",
+        "x": 430,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "aa000000000000d0",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Shore Mode Feedback",
+        "func": "// Send shore_mode back to button group to keep UI in sync\nmsg.payload = flow.get('shore_mode') || 'off';\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 200,
+        "y": 860,
+        "wires": [
+            [
+                "aa000000000000eb"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000f0",
+        "type": "inject",
+        "z": "aa00000000000001",
+        "name": "Clear Charts on Deploy",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "action",
+                "v": "replace",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.5",
+        "topic": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "x": 200,
+        "y": 900,
+        "wires": [
+            [
+                "aa000000000000c1",
+                "aa000000000000c3"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000e3",
+        "type": "ui-button-group",
+        "z": "aa00000000000001",
+        "name": "AC Charger Toggle",
+        "group": "aa00000000000012",
+        "order": 3,
+        "width": 3,
+        "height": 1,
+        "label": "AC Charger",
+        "className": "",
+        "rounded": true,
+        "useThemeColors": true,
+        "passthru": false,
+        "options": [
+            {
+                "label": "ENABLED",
+                "value": "enabled",
+                "valueType": "str"
+            },
+            {
+                "label": "DISABLED",
+                "value": "disabled",
+                "valueType": "str"
+            }
+        ],
+        "topic": "charger_disable",
+        "topicType": "str",
+        "x": 150,
+        "y": 620,
+        "wires": [
+            [
+                "aa000000000000e4"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000e4",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Manual Relay Handler",
+        "func": "// payload \"disabled\" = charger OFF (relay closed=1)\n// payload \"enabled\" = charger ON (relay open=0)\nconst disable = msg.payload === \"disabled\";\nflow.set('manual_relay', disable);\nnode.status({fill: disable ? 'red' : 'green', shape: 'dot',\n             text: disable ? 'charger: OFF' : 'charger: ON'});\nreturn [{ payload: disable ? 1 : 0 }, { payload: disable ? \"disabled\" : \"enabled\" }];",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 620,
+        "wires": [
+            [
+                "aa00000000000041"
+            ],
+            [
+                "aa000000000000e3"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000e5",
+        "type": "ui-slider",
+        "z": "aa00000000000001",
+        "name": "AC Input Limit Slider",
+        "group": "aa00000000000012",
+        "order": 4,
+        "width": 3,
+        "height": 1,
+        "label": "Shore Input Limit (A)",
+        "tooltip": "AC input current limit (10-50A). Applies immediately to shore input.",
+        "passthru": false,
+        "outs": "end",
+        "topic": "ac_limit",
+        "topicType": "str",
+        "thumbLabel": "always",
+        "showTicks": "always",
+        "min": 10,
+        "max": 50,
+        "step": 0.5,
+        "className": "",
+        "x": 150,
+        "y": 660,
+        "wires": [
+            [
+                "aa000000000000e6"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000e6",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Set AC Limit Handler",
+        "func": "const val = Math.max(10, Math.min(50, Number(msg.payload)));\nflow.set('ac_limit', val);\nnode.status({fill: 'blue', shape: 'dot', text: val + 'A'});\nmsg.payload = val;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 660,
+        "wires": [
+            [
+                "aa000000000000e7"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000e7",
+        "type": "victron-output-custom",
+        "z": "aa00000000000001",
+        "name": "Set AC In 2 Limit",
+        "service": "com.victronenergy.vebus.ttyS4",
+        "path": "/Ac/In/2/CurrentLimit",
+        "serviceObj": {
+            "service": "com.victronenergy.vebus.ttyS4",
+            "name": "Quattro 48/5000/70-2x100 120V"
+        },
+        "pathObj": {
+            "path": "/Ac/In/2/CurrentLimit",
+            "type": "float",
+            "name": "Input current limit"
+        },
+        "initial": "",
+        "x": 610,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "aa000000000000e8",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Charger Toggle Feedback",
+        "func": "const d = msg.payload;\nif (!d || typeof d !== 'object') return null;\nconst manualRelay = flow.get('manual_relay') || false;\n// manualRelay=true \u2192 relay closed \u2192 charger disabled\nreturn { payload: manualRelay ? \"disabled\" : \"enabled\" };",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 580,
+        "wires": [
+            [
+                "aa000000000000e3"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000e9",
+        "type": "victron-input-vebus",
+        "z": "aa00000000000001",
+        "name": "ac_in2_limit_read",
+        "service": "com.victronenergy.vebus/276",
+        "path": "/Ac/In/2/CurrentLimit",
+        "serviceObj": {
+            "service": "com.victronenergy.vebus/276",
+            "name": "Quattro 48/5000/70-2x100 120V"
+        },
+        "pathObj": {
+            "path": "/Ac/In/2/CurrentLimit",
+            "type": "float",
+            "name": "AC Input 2 current limit (A)"
+        },
+        "onlyChanges": false,
+        "roundValues": "1",
+        "x": 130,
+        "y": 700,
+        "wires": [
+            [
+                "aa000000000000e5",
+                "aa000000000000ea"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000ea",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Init AC Limit Context",
+        "func": "flow.set('ac_limit', msg.payload);\nnode.status({fill: 'blue', shape: 'dot', text: msg.payload + 'A (live)'});\nreturn null;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "aa000000000000eb",
+        "type": "ui-button-group",
+        "z": "aa00000000000001",
+        "name": "Shore Mode",
+        "group": "aa00000000000012",
+        "order": 1,
+        "width": 3,
+        "height": 1,
+        "label": "Shore Power",
+        "className": "",
+        "rounded": true,
+        "useThemeColors": true,
+        "passthru": false,
+        "options": [
+            {
+                "label": "AUTO",
+                "value": "auto",
+                "valueType": "str"
+            },
+            {
+                "label": "ON",
+                "value": "on",
+                "valueType": "str"
+            },
+            {
+                "label": "OFF",
+                "value": "off",
+                "valueType": "str"
+            }
+        ],
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 150,
+        "y": 500,
+        "wires": [
+            [
+                "aa000000000000ec"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000ec",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Shore Mode Handler",
+        "func": "const mode = msg.payload;\nflow.set('shore_mode', mode);\n\nif (mode === 'auto') {\n    flow.set('enabled', true);\n    node.status({fill: 'green', shape: 'dot', text: 'AUTO'});\n    return null;  // state machine takes over IgnoreAcIn2\n} else if (mode === 'on') {\n    flow.set('enabled', false);\n    node.status({fill: 'blue', shape: 'dot', text: 'shore: ON'});\n    return { payload: 0 };  // IgnoreAcIn2=0 \u2014 accept shore\n} else if (mode === 'off') {\n    flow.set('enabled', false);\n    node.status({fill: 'grey', shape: 'dot', text: 'shore: OFF'});\n    return { payload: 1 };  // IgnoreAcIn2=1 \u2014 reject shore\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 500,
+        "wires": [
+            [
+                "aa00000000000040"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000f1",
+        "type": "victron-input-system",
+        "z": "aa00000000000001",
+        "name": "batt_voltage",
+        "service": "com.victronenergy.system/0",
+        "path": "/Dc/Battery/Voltage",
+        "serviceObj": {
+            "service": "com.victronenergy.system/0",
+            "name": "Venus system"
+        },
+        "pathObj": {
+            "path": "/Dc/Battery/Voltage",
+            "type": "float",
+            "name": "Battery voltage (V)"
+        },
+        "onlyChanges": false,
+        "roundValues": "1",
+        "x": 130,
+        "y": 530,
+        "wires": [
+            [
+                "aa00000000000030"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000f2",
+        "type": "ui-slider",
+        "z": "aa00000000000001",
+        "name": "Voltage Threshold",
+        "group": "aa00000000000013",
+        "order": 3,
+        "width": 6,
+        "height": 1,
+        "label": "Connect Shore (Voltage)",
+        "tooltip": "Connect shore power when battery voltage drops to this level",
+        "passthru": false,
+        "outs": "end",
+        "topic": "voltage_threshold_low",
+        "topicType": "str",
+        "thumbLabel": "always",
+        "showTicks": "always",
+        "min": 40,
+        "max": 54,
+        "step": 0.1,
+        "className": "",
+        "x": 150,
+        "y": 680,
+        "wires": [
+            [
+                "aa000000000000f3"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000f3",
+        "type": "function",
+        "z": "aa00000000000001",
+        "name": "Set Voltage Threshold",
+        "func": "const val = Math.round(Math.max(40, Math.min(54, Number(msg.payload))) * 10) / 10;\nflow.set('voltage_threshold_low', val);\nnode.status({fill: 'green', shape: 'dot', text: val + 'V'});\n// Update threshold status text\nconst low = flow.get('threshold_low') || 40;\nconst high = flow.get('threshold_high') || 60;\nmsg.payload = 'Connect: ' + low + '% or \\u2264' + val.toFixed(1) + 'V \u2192 Disconnect: ' + high + '%';\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 680,
+        "wires": [
+            [
+                "aa000000000000a1"
+            ]
+        ]
+    },
+    {
+        "id": "aa000000000000f5",
+        "type": "ui-text",
+        "z": "aa00000000000001",
+        "group": "aa00000000000012",
+        "name": "Shore Status",
+        "order": 2,
+        "width": 3,
+        "height": 1,
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-right",
+        "style": false,
+        "font": "",
+        "color": "#717171",
+        "className": "",
+        "x": 920,
+        "y": 280,
+        "wires": [],
+        "fontSize": 14
+    }
+]
