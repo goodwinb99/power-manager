@@ -196,6 +196,16 @@ Update three nodes:
 2. **Set Voltage Threshold handler** (`aa000000000000f3`) — clamp range in `Math.max(min, Math.min(max, ...))`
 3. **State Machine init** (`aa00000000000030`, `initialize` field) — default for `voltage_threshold_low`
 
+### Single-Phase Systems
+
+The dashboard ships with separate L1 and L2 gauges for AC Out and Shore In, designed for split-phase inverter setups. On a single-phase system, the L2 gauges will always read 0W.
+
+To clean up the dashboard, remove the L2 gauge nodes:
+- AC Out L2: `aa000000000000b0`
+- Shore In L2: `aa000000000000b1`
+
+The L2 sensor nodes and the rest of the flow are safe to leave as-is — all L2 values fall back to 0 when the DBUS paths don't exist, so the Power History chart (which sums L1+L2) works correctly on both single-phase and split-phase systems without changes.
+
 ### Gauge Ranges and Color Thresholds
 
 Gauge maximums and color breakpoints reflect the installed inverter/charger/solar capacity:
