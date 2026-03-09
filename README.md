@@ -1,4 +1,4 @@
-# Power Manager — Solar-Priority Shore Power Automation for Victron RV Systems
+# Victron Power Manager — Solar-Priority Shore Power Automation for Venus OS
 
 A Node-RED flow for Venus OS (Cerbo GX) that automatically manages shore power based on battery state of charge and voltage, while keeping solar charging active at all times.
 
@@ -112,7 +112,7 @@ Since this project fully replaces that logic with its own SOC/voltage-based stat
 dbus -y com.victronenergy.settings /Settings/CGwacs/BatteryLife/State SetValue 0
 ```
 
-> If you're using ESS with BatteryLife for grid-tied self-consumption, this project is not the right fit — it's designed for off-grid/RV systems where shore power is optional and solar is the primary charge source.
+> If you're using ESS with BatteryLife for grid-tied self-consumption, this project is not the right fit — it's designed for off-grid systems where shore power is optional and solar is the primary charge source.
 
 ### 6. Update Service References in flows.json
 
