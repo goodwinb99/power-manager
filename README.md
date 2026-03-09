@@ -177,23 +177,54 @@ See [CLAUDE.md](CLAUDE.md) for the full API when writing change scripts.
 - **Protective charger default** — charger auto defaults to CHARGER_ON in the hysteresis zone, assuming the battery may need help
 - **Node-RED crash** — relay and IgnoreAcIn2 stay in their last state; shore continues if it was accepted
 
-## Adapting to Other System Voltages
+## Adapting to Your System
 
-This project ships configured for a **48V LFP (LiFePO4)** battery system. The only voltage-specific items are:
+The flows ship configured for a specific system (dual Quattro 48/5000 split-phase, 628Ah 48V LFP bank, 150/100 MPPT). Most values are easy to adjust via `flows_manager.py` scripts.
+
+### Voltage Threshold
+
+The voltage safety slider and its defaults are battery-voltage-specific:
 
 | Item | Current (48V) | 12V LFP | 24V LFP | 12V Lead-Acid |
 |------|---------------|---------|---------|----------------|
 | Voltage slider range | 40–54V | 10–14.6V | 20–29.2V | 10–15V |
-| Voltage slider step | 0.1V | 0.1V | 0.1V | 0.1V |
 | Default voltage threshold | 48.0V | 12.0V | 24.0V | 11.5V |
 
-To change these, update three nodes in `flows.json` via a script:
+Update three nodes:
 
-1. **Voltage Threshold slider** (`aa000000000000f2`) — update `min`, `max`, and default value
-2. **Set Voltage Threshold handler** (`aa000000000000f3`) — update the clamp range in `Math.max(min, Math.min(max, ...))`
-3. **State Machine init** (`aa00000000000030`, `initialize` field) — update the default value for `voltage_threshold_low`
+1. **Voltage Threshold slider** (`aa000000000000f2`) — `min`, `max`
+2. **Set Voltage Threshold handler** (`aa000000000000f3`) — clamp range in `Math.max(min, Math.min(max, ...))`
+3. **State Machine init** (`aa00000000000030`, `initialize` field) — default for `voltage_threshold_low`
 
-Everything else (SOC thresholds, shore/charger modes, relay logic, DBUS paths) is voltage-independent and works on any Victron system.
+### Gauge Ranges and Color Thresholds
+
+Gauge maximums and color breakpoints reflect the installed inverter/charger/solar capacity:
+
+| Gauge | Node ID | Max | Color breakpoints | Sized for |
+|-------|---------|-----|-------------------|-----------|
+| AC Out L1 | `aa00000000000072` | 5000W | green→orange 2500W, orange→red 4000W | 5kVA inverter |
+| AC Out L2 | `aa000000000000b0` | 5000W | green→orange 2500W, orange→red 4000W | 5kVA inverter |
+| Shore In L1 | `aa00000000000075` | 6000W | green→orange 3000W, orange→red 5000W | 50A shore |
+| Shore In L2 | `aa000000000000b1` | 6000W | green→orange 3000W, orange→red 5000W | 50A shore |
+| Solar | `aa00000000000073` | 5000W | grey→yellow 500W, yellow→green 2000W | 150/100 MPPT |
+
+Update with `flows_manager.py`: `update(flows, '<id>', max=<new_max>, segments=[...])`.
+
+### Battery Current Widget
+
+The battery current bar graph (`aa00000000000074`, ui-template) is hardcoded for ±200A. To adjust for your battery bank, edit the template's `max` variable and the scale labels (`-200A`, `0`, `+200A`).
+
+### Power History Chart
+
+The Power History chart (`aa000000000000c3`) has `ymax=12000` (12kW), sized for dual 5kVA inverters. Update with `update(flows, 'aa000000000000c3', ymax=<your_max>)`.
+
+### AC Input Limit Slider
+
+The AC Input Limit slider (`aa000000000000e5`) ranges 0–50A. Adjust `max` to match your shore breaker rating or inverter input limit.
+
+### DBUS Service References
+
+See [Setup § Update Service References](#6-update-service-references-in-flowsjson) — these must match your specific hardware.
 
 ## File Structure
 
